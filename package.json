@@ -1,0 +1,41 @@
+{
+  "name": "gom-jabbar",
+  "version": "1.0.0",
+  "description": "Asserting humanity's failings",
+  "main": "index.js",
+  "bin": {
+    "gom-jabbar": "./bin/gom-jabbar.js"
+  },
+  "scripts": {
+    "test": "mocha --growl"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/XLabKC/GomJabbar.git"
+  },
+  "keywords": [
+    "test",
+    "testing",
+    "framework",
+    "mincer"
+  ],
+  "author": "Blake VanLandingham",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/XLabKC/GomJabbar/issues"
+  },
+  "homepage": "https://github.com/XLabKC/GomJabbar#readme",
+  "dependencies": {
+    "async": "^1.5.2",
+    "cli": "^0.11.1",
+    "colors": "^1.1.2",
+    "express": "^4.13.4",
+    "mincer": "^1.4.1",
+    "selenium-webdriver": "^2.52.0"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^2.4.5",
+    "supertest": "^1.2.0"
+  }
+}
