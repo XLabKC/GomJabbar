@@ -7,7 +7,8 @@
     "gom-jabbar": "./bin/gom-jabbar.js"
   },
   "scripts": {
-    "test": "mocha --growl"
+    "test": "mocha --growl && npm run demo",
+    "demo": "./bin/gom-jabbar.js -s ./test/resources/src -d ./test/resources/test -r ./test/resources/srcResources -x ./test/resources/testResources"
   },
   "repository": {
     "type": "git",

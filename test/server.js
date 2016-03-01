@@ -34,8 +34,8 @@ describe('Server', function() {
             .expect(200)
             .expect(function(res) {
                expect(res.text).to.contain('<script src="/resources/gom-jabbar.js"></script>');
-               expect(res.text).to.contain('<script src="/resources/mocha.css"></script>');
                expect(res.text).to.contain('<script src="/resources/mocha.js"></script>');
+               expect(res.text).to.contain('<link rel="stylesheet" href="/resources/mocha.css" />');
             })
             .end(done);
       });

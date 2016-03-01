@@ -15,11 +15,7 @@ function Server(options) {
    this.testDir = options.testDir;
    this.testResourceDir = options.testResourceDir;
    this.sourceResourceDir = options.sourceResourceDir;
-   this.gomJabbarResources = [
-      '/resources/gom-jabbar.js',
-      '/resources/mocha.css',
-      '/resources/mocha.js'
-   ];
+   this.gomJabbarResources = ['/resources/gom-jabbar.js', '/resources/mocha.js'];
 
    if (!this.sourceDir) throw new Error('Missing: option.sourceDir');
    if (!this.testDir) throw new Error('Missing: option.testDir');
@@ -47,9 +43,11 @@ function Server(options) {
    });
 
    // Serve the gom jabbar client-side runner and the mocha framework.
-   for (var i = 0; i < this.gomJabbarResources.length; i++) {
-      this.app.get(this.gomJabbarResources[i], this.serveStaticResource_);
-   }
+   this.app.use('/resources', express.static(path.join(__dirname, 'resources')));
+
+   // for (var i = 0; i < this.gomJabbarResources.length; i++) {
+   //    this.app.get(this.gomJabbarResources[i], this.serveStaticResource_);
+   // }
 
    // Serves javascript assets. 
    this.app.get('/scripts/*', (function (req, res, next) {
@@ -107,13 +105,13 @@ Server.prototype.generateHtml = function(testFile) {
    html.push('<title>Mocha</title>');
    html.push('<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">');
    html.push('<meta name="viewport" content="width=device-width, initial-scale=1.0">');
-   html.push('<link rel="stylesheet" href="/mocha.css" />');
+   html.push('<link rel="stylesheet" href="/resources/mocha.css" />');
    html.push('</head>');
    html.push('<body>');
    html.push('<div id="mocha"></div>');
 
    for (var i = 0; i < this.gomJabbarResources.length; i++) {
-      html.push('<script src="' + this.gomJabbarResources[i] + '"></script>');
+      html.push('<script src="' + this.gomJabbarResources[i] + '"></script>');   
    }
    
    if (this.testResourceDir) {
@@ -140,19 +138,22 @@ Server.prototype.generateHtml = function(testFile) {
 };
 
 /** Responds with the resource at the given path. */
-Server.prototype.serveStaticResource_ = function(req, res, next) {
-   var resourceName = url.parse(req.url).pathname;
-   var resourcePath = path.join(__dirname, resourceName);
-   fs.readFile(resourcePath, function(err, data) {
-      if (err) {
-         res.status(500).send(err.message);
-         console.error('\n%s\n', e.toString());
-         return;
-      }
-      res.setHeader('Content-Type', 'application/javascript');
-      res.send(data);
-   });
-};
+// Server.prototype.serveStaticResource_ = function(req, res, next) {
+//    var resourceName = url.parse(req.url).pathname;
+//    var resourcePath = path.join(__dirname, resourceName);
+//    fs.readFile(resourcePath, function(err, data) {
+//       if (err) {
+//          res.status(500).send(err.message);
+//          console.error('\n%s\n', e.toString());
+//          return;
+//       }
+//       var ext = path.extname(resourceName);
+//       console.log("RESOURCE: ", resourceName, ext);
+//       if (ext === '.css') res.setHeader('Content-Type', 'text/css');
+//       if (ext === '.js') res.setHeader('Content-Type', 'application/javascript');
+//       res.send(data);
+//    });
+// };
 
 
 module.exports = Server;
