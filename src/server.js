@@ -115,19 +115,13 @@ Server.prototype.generateHtml = function(testFile) {
    }
    
    if (this.testResourceDir) {
-      var files = fs.readdirSync(this.testResourceDir);
-      for (var i = 0; i < files.length; i++) {
-         html.push('<script src="/' + files[i] + '"></script>');
-      }
+      html.push(this.generateScriptTagsForDirectory(this.testResourceDir));
    }
 
    html.push('<script>mocha.setup("bdd")</script>');
 
    if (this.sourceResourceDir) {
-      var files = fs.readdirSync(this.sourceResourceDir);
-      for (var i = 0; i < files.length; i++) {
-         html.push('<script src="/' + files[i] + '"></script>');
-      }
+      html.push(this.generateScriptTagsForDirectory(this.sourceResourceDir));
    }
 
    html.push('<script src="' + path.join('/scripts', testFile) + '"></script>');
@@ -137,23 +131,30 @@ Server.prototype.generateHtml = function(testFile) {
    return html.join('');
 };
 
-/** Responds with the resource at the given path. */
-// Server.prototype.serveStaticResource_ = function(req, res, next) {
-//    var resourceName = url.parse(req.url).pathname;
-//    var resourcePath = path.join(__dirname, resourceName);
-//    fs.readFile(resourcePath, function(err, data) {
-//       if (err) {
-//          res.status(500).send(err.message);
-//          console.error('\n%s\n', e.toString());
-//          return;
-//       }
-//       var ext = path.extname(resourceName);
-//       console.log("RESOURCE: ", resourceName, ext);
-//       if (ext === '.css') res.setHeader('Content-Type', 'text/css');
-//       if (ext === '.js') res.setHeader('Content-Type', 'application/javascript');
-//       res.send(data);
-//    });
-// };
+Server.prototype.generateScriptTagsForDirectory = function(directory) {
+   var html = [];
+   var files = fs.readdirSync(directory);
+   var order = [];
+   if (files.indexOf('.order') !== -1) {
+      var orderFile = fs.readFileSync(path.join(directory, '.order'), 'utf8');
+      order = orderFile.split('\n');
+   }
+
+   // Add script tags for ordered files first.
+   for (var i = 0; i < order.length; i++) {
+      if (files.indexOf(order[i]) !== -1) {
+         html.push('<script src="/' + order[i] + '"></script>');
+      }
+   }
+   
+   // Add any remaining files.
+   for (i = 0; i < files.length; i++) {
+      if (order.indexOf(files[i]) === -1 && files[i] !== '.order') {
+         html.push('<script src="/' + files[i] + '"></script>');
+      } 
+   }
+   return html.join('');
+};
 
 
 module.exports = Server;

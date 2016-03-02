@@ -46,6 +46,42 @@ describe('Server', function() {
             .expect(200)
             .expect(function(res) {
                expect(res.text).to.contain('<script src="/src-dep.js"></script>');
+               expect(res.text).to.contain('<script src="/src-dep2.js"></script>');
+            })
+            .end(done);
+      });
+
+      it('should include the src resources in the order specified by .order file', function(done) {
+         request(SERVER_URL)
+            .get('/')
+            .expect(200)
+            .expect(function(res) {
+               index1 = res.text.indexOf('<script src="/src-dep.js"></script>');
+               index2 = res.text.indexOf('<script src="/src-dep2.js"></script>');
+               expect(index1).to.be.below(index2);
+            })
+            .end(done);
+      });
+
+      it('should include the test resources', function(done) {
+         request(SERVER_URL)
+            .get('/')
+            .expect(200)
+            .expect(function(res) {
+               expect(res.text).to.contain('<script src="/test-dep.js"></script>');
+               expect(res.text).to.contain('<script src="/test-dep2.js"></script>');
+            })
+            .end(done);
+      });
+
+      it('should include the test resources in the order specified by .order file', function(done) {
+         request(SERVER_URL)
+            .get('/')
+            .expect(200)
+            .expect(function(res) {
+               index1 = res.text.indexOf('<script src="/test-dep2.js"></script>');
+               index2 = res.text.indexOf('<script src="/test-dep.js"></script>');
+               expect(index1).to.be.below(index2);
             })
             .end(done);
       });
