@@ -9,25 +9,25 @@ var test = function(options, callback) {
    var manual = options.manual || false;
    var sourceDir = options.srcDir || './src';
    var testDir = options.testDir || './test';
-   var sourceResourceDir = options.srcResourceDir || null;
-   var testResourceDir = options.testResourceDir || null;
+   var sourceResourcesDir = options.srcResourcesDir || null;
+   var testResourcesDir = options.testResourcesDir || null;
    
    // Verify that the directories exist.
    if (!isValidDirectory(sourceDir)) return callback(errorForBadDir('sourceDir', sourceDir));
    if (!isValidDirectory(testDir)) return callback(errorForBadDir('testDir', testDir));
-   if (sourceResourceDir && !isValidDirectory(sourceResourceDir)) {
-      return callback(errorForBadDir('sourceResourceDir', sourceResourceDir));
+   if (sourceResourcesDir && !isValidDirectory(sourceResourcesDir)) {
+      return callback(errorForBadDir('sourceResourcesDir', sourceResourcesDir));
    }
-   if (testResourceDir && !isValidDirectory(testResourceDir)) {
-      return callback(errorForBadDir('testResourceDir', testResourceDir));
+   if (testResourcesDir && !isValidDirectory(testResourcesDir)) {
+      return callback(errorForBadDir('testResourcesDir', testResourcesDir));
    }
 
    var server = new Server({
       port: port,
       sourceDir: sourceDir,
       testDir: testDir,
-      sourceResourceDir: sourceResourceDir,
-      testResourceDir: testResourceDir
+      sourceResourcesDir: sourceResourcesDir,
+      testResourcesDir: testResourcesDir
    });
    server.start(function(err) {
       if (err) return callback(err);

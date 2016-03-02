@@ -14,8 +14,8 @@ describe('Server', function() {
          port: PORT,
          sourceDir: './test/resources/src',
          testDir: './test/resources/test',
-         sourceResourceDir: './test/resources/srcResources',
-         testResourceDir: './test/resources/testResources'
+         sourceResourcesDir: './test/resources/srcResources',
+         testResourcesDir: './test/resources/testResources'
       });
       this.server.start(done);
    });

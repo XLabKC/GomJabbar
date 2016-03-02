@@ -1,5 +1,4 @@
 var async = require('async');
-// var coffee = require('coffee-script');
 var express = require('express');
 var fs = require('fs');
 var http = require('http');
@@ -13,8 +12,8 @@ function Server(options) {
    this.port = options.port || 4001;
    this.sourceDir = options.sourceDir;
    this.testDir = options.testDir;
-   this.testResourceDir = options.testResourceDir;
-   this.sourceResourceDir = options.sourceResourceDir;
+   this.testResourcesDir = options.testResourcesDir;
+   this.sourceResourcesDir = options.sourceResourcesDir;
    this.gomJabbarResources = ['/resources/gom-jabbar.js', '/resources/mocha.js'];
 
    if (!this.sourceDir) throw new Error('Missing: option.sourceDir');
@@ -28,13 +27,13 @@ function Server(options) {
    this.app = express();
 
    // Serves the assets required for every test.   
-   if (this.testResourceDir) {
-      this.app.use(express.static(this.testResourceDir));
+   if (this.testResourcesDir) {
+      this.app.use(express.static(this.testResourcesDir));
    }
 
    // Serves the assets required for the source to run.
-   if (this.sourceResourceDir) {
-      this.app.use(express.static(this.sourceResourceDir));
+   if (this.sourceResourcesDir) {
+      this.app.use(express.static(this.sourceResourcesDir));
    }
 
    // Filters out favicon.ico calls.
@@ -114,14 +113,14 @@ Server.prototype.generateHtml = function(testFile) {
       html.push('<script src="' + this.gomJabbarResources[i] + '"></script>');   
    }
    
-   if (this.testResourceDir) {
-      html.push(this.generateScriptTagsForDirectory(this.testResourceDir));
+   if (this.testResourcesDir) {
+      html.push(this.generateScriptTagsForDirectory(this.testResourcesDir));
    }
 
    html.push('<script>mocha.setup("bdd")</script>');
 
-   if (this.sourceResourceDir) {
-      html.push(this.generateScriptTagsForDirectory(this.sourceResourceDir));
+   if (this.sourceResourcesDir) {
+      html.push(this.generateScriptTagsForDirectory(this.sourceResourcesDir));
    }
 
    html.push('<script src="' + path.join('/scripts', testFile) + '"></script>');
