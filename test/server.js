@@ -70,7 +70,8 @@ describe('Server', function() {
             .get('/')
             .expect(200)
             .expect(function(res) {
-               expect(res.text).to.contain('<script src="/src-resources/src-dep3.js"></script>');
+               var src = '/src-resources/test/resources/srcResourceFiles/src-dep3.js';
+               expect(res.text).to.contain('<script src="' + src +'"></script>');
             })
             .end(done);
       });
@@ -103,7 +104,8 @@ describe('Server', function() {
             .get('/')
             .expect(200)
             .expect(function(res) {
-               expect(res.text).to.contain('<script src="/test-resources/test-dep3.js"></script>');
+               var src = '/test-resources/test/resources/testResourceFiles/test-dep3.js';
+               expect(res.text).to.contain('<script src="' + src +'"></script>');
             })
             .end(done);
       });
@@ -177,7 +179,7 @@ describe('Server', function() {
 
       it('should server the src resource files with required files', function(done) {
          request(SERVER_URL)
-            .get('/src-resources/src-dep3.js')
+            .get('/src-resources/test/resources/srcResourceFiles/src-dep3.js')
             .expect(200)
             .expect('Content-Type', /javascript/)
             .expect(function(res) {
@@ -201,7 +203,7 @@ describe('Server', function() {
 
       it('should server the test resource files with required files', function(done) {
          request(SERVER_URL)
-            .get('/test-resources/test-dep3.js')
+            .get('/test-resources/test/resources/testResourceFiles/test-dep3.js')
             .expect(200)
             .expect('Content-Type', /javascript/)
             .expect(function(res) {

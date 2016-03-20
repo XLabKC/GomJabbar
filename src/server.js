@@ -48,14 +48,12 @@ function Server(options) {
 
    // Serve the src resources.
    if (this.sourceResources) {
-      var srcEnv = this.createEnvironmentForFiles(this.sourceResources);
-      this.app.use('/src-resources', Mincer.createServer(srcEnv));
+      this.createRouteForFiles(this.sourceResources, '/src-resources');
    }   
 
    // Serve the test resources.
    if (this.testResources) {
-      var testEnv = this.createEnvironmentForFiles(this.testResources);
-      this.app.use('/test-resources', Mincer.createServer(testEnv));
+      this.createRouteForFiles(this.testResources, '/test-resources');
    }   
 
    // Serves javascript assets. 
@@ -176,22 +174,22 @@ Server.prototype.generateScriptTagsForDirectory = function(directory) {
 Server.prototype.generateScriptTagsForResourceFiles = function(files, prefix) {
    var html = [];
    for (var i = 0; i < files.length; i++) {
-      html.push('<script src="' + path.join(prefix, path.basename(files[i])) + '"></script>');
+      html.push('<script src="' + path.join(prefix, files[i]) + '"></script>');
    }
    return html.join('');
 }
 
-Server.prototype.createEnvironmentForFiles = function(files) {
-   var environment = new Mincer.Environment();
+Server.prototype.createRouteForFiles = function(files, prefix) {
    var directories = [];
    for (var i = 0; i < files.length; i++) {
       var dir = path.dirname(files[i]);
       if (dir && directories.indexOf(dir) == -1) {
+         var env = new Mincer.Environment();
+         env.appendPath(dir);
+         this.app.use(path.join(prefix, dir), Mincer.createServer(env));
          directories.push(dir);
-         environment.appendPath(dir);
       }   
    }
-   return environment;
 }
 
 module.exports = Server;
