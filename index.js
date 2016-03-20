@@ -9,6 +9,8 @@ var test = function(options, callback) {
    var manual = options.manual || false;
    var sourceDir = options.srcDir || './src';
    var testDir = options.testDir || './test';
+   var sourceResources = options.srcResources || null;
+   var testResources = options.testResources || null;
    var sourceResourcesDir = options.srcResourcesDir || null;
    var testResourcesDir = options.testResourcesDir || null;
    
@@ -22,10 +24,28 @@ var test = function(options, callback) {
       return callback(errorForBadDir('testResourcesDir', testResourcesDir));
    }
 
+   // Verify that all files exist.
+   if (testResources) {
+      for (var i = 0; i < testResources.length; i++) {
+         if (!isValidFile(testResources[i])) {
+            return callback(errorForBadFile('testResources', testResources[i]));   
+         }
+      }
+   }
+   if (sourceResources) {
+      for (var i = 0; i < sourceResources.length; i++) {
+         if (!isValidFile(sourceResources[i])) {
+            return callback(errorForBadFile('sourceResources', sourceResources[i]));   
+         }
+      }  
+   }
+   
    var server = new Server({
       port: port,
       sourceDir: sourceDir,
       testDir: testDir,
+      sourceResources: sourceResources,
+      testResources: testResources,
       sourceResourcesDir: sourceResourcesDir,
       testResourcesDir: testResourcesDir
    });
@@ -52,16 +72,31 @@ var test = function(options, callback) {
 }
 
 var isValidDirectory = function(directory) {
+   var stats = null;
    try {
-      fs.statSync(directory);
+      stats = fs.statSync(directory);
    } catch (err) {
       return false;
    }
-   return true;
+   return stats.isDirectory();
+}
+
+var isValidFile = function(file) {
+   var stats = null;
+   try {
+      stats = fs.statSync(file);
+   } catch (err) {
+      return false;
+   }
+   return stats.isFile()
 }
 
 var errorForBadDir = function(paramName, directory) {
-   return new Error('[' + paramName + '] Directory does not exist: ' + directory);  
+   return new Error('[' + paramName + '] Directory does not exist: ' + directory);
+}
+
+var errorForBadFile = function(paramName, file) {
+   return new Error('[' + paramName + '] File does not exist: ' + file);  
 }
 
 var onStartedTestingOnBrowser = function(data) {

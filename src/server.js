@@ -12,9 +12,11 @@ function Server(options) {
    this.port = options.port || 4001;
    this.sourceDir = options.sourceDir;
    this.testDir = options.testDir;
+   this.sourceResources = options.sourceResources;
+   this.testResources = options.testResources;
    this.testResourcesDir = options.testResourcesDir;
    this.sourceResourcesDir = options.sourceResourcesDir;
-   this.gomJabbarResources = ['/resources/gom-jabbar.js', '/resources/mocha.js'];
+   this.gomJabbarResources = ['gom-jabbar.js', 'mocha.js'];
 
    if (!this.sourceDir) throw new Error('Missing: option.sourceDir');
    if (!this.testDir) throw new Error('Missing: option.testDir');
@@ -42,11 +44,19 @@ function Server(options) {
    });
 
    // Serve the gom jabbar client-side runner and the mocha framework.
-   this.app.use('/resources', express.static(path.join(__dirname, 'resources')));
+   this.app.use('/gom-jabbar-resources', express.static(path.join(__dirname, 'resources')));
 
-   // for (var i = 0; i < this.gomJabbarResources.length; i++) {
-   //    this.app.get(this.gomJabbarResources[i], this.serveStaticResource_);
-   // }
+   // Serve the src resources.
+   if (this.sourceResources) {
+      var srcEnv = this.createEnvironmentForFiles(this.sourceResources);
+      this.app.use('/src-resources', Mincer.createServer(srcEnv));
+   }   
+
+   // Serve the test resources.
+   if (this.testResources) {
+      var testEnv = this.createEnvironmentForFiles(this.testResources);
+      this.app.use('/test-resources', Mincer.createServer(testEnv));
+   }   
 
    // Serves javascript assets. 
    this.app.get('/scripts/*', (function (req, res, next) {
@@ -104,23 +114,31 @@ Server.prototype.generateHtml = function(testFile) {
    html.push('<title>Mocha</title>');
    html.push('<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">');
    html.push('<meta name="viewport" content="width=device-width, initial-scale=1.0">');
-   html.push('<link rel="stylesheet" href="/resources/mocha.css" />');
+   html.push('<link rel="stylesheet" href="/gom-jabbar-resources/mocha.css" />');
    html.push('</head>');
    html.push('<body>');
    html.push('<div id="mocha"></div>');
 
    for (var i = 0; i < this.gomJabbarResources.length; i++) {
-      html.push('<script src="' + this.gomJabbarResources[i] + '"></script>');   
+      html.push('<script src="/gom-jabbar-resources/' + this.gomJabbarResources[i] + '"></script>');   
    }
    
    if (this.testResourcesDir) {
       html.push(this.generateScriptTagsForDirectory(this.testResourcesDir));
    }
 
+   if (this.testResources) {
+      html.push(this.generateScriptTagsForResourceFiles(this.testResources, '/test-resources'));  
+   }
+
    html.push('<script>mocha.setup("bdd")</script>');
 
    if (this.sourceResourcesDir) {
       html.push(this.generateScriptTagsForDirectory(this.sourceResourcesDir));
+   }
+
+   if (this.sourceResources) {
+      html.push(this.generateScriptTagsForResourceFiles(this.sourceResources, '/src-resources'));
    }
 
    html.push('<script src="' + path.join('/scripts', testFile) + '"></script>');
@@ -155,5 +173,25 @@ Server.prototype.generateScriptTagsForDirectory = function(directory) {
    return html.join('');
 };
 
+Server.prototype.generateScriptTagsForResourceFiles = function(files, prefix) {
+   var html = [];
+   for (var i = 0; i < files.length; i++) {
+      html.push('<script src="' + path.join(prefix, path.basename(files[i])) + '"></script>');
+   }
+   return html.join('');
+}
+
+Server.prototype.createEnvironmentForFiles = function(files) {
+   var environment = new Mincer.Environment();
+   var directories = [];
+   for (var i = 0; i < files.length; i++) {
+      var dir = path.dirname(files[i]);
+      if (dir && directories.indexOf(dir) == -1) {
+         directories.push(dir);
+         environment.appendPath(dir);
+      }   
+   }
+   return environment;
+}
 
 module.exports = Server;

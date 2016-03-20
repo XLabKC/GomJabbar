@@ -1,14 +1,15 @@
 {
   "name": "gom-jabbar",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Asserting humanity's failings",
   "main": "index.js",
   "bin": {
     "gom-jabbar": "./bin/gom-jabbar.js"
   },
   "scripts": {
-    "test": "mocha --growl && npm run demo",
-    "demo": "./bin/gom-jabbar.js -s ./test/resources/src -d ./test/resources/test -r ./test/resources/srcResources -x ./test/resources/testResources"
+    "test": "npm run test-unit && npm run demo",
+    "test-unit": "mocha --growl",
+    "demo": "./bin/gom-jabbar.js --srcDir ./test/resources/src --testDir ./test/resources/test --srcResources ./test/resources/srcResourceFiles/src-dep3.js --srcResourcesDir ./test/resources/srcResources --testResources ./test/resources/testResourceFiles/test-dep3.js --testResourcesDir ./test/resources/testResources"
   },
   "repository": {
     "type": "git",

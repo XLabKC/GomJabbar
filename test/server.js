@@ -14,8 +14,10 @@ describe('Server', function() {
          port: PORT,
          sourceDir: './test/resources/src',
          testDir: './test/resources/test',
+         sourceResources: ['./test/resources/srcResourceFiles/src-dep3.js'],
          sourceResourcesDir: './test/resources/srcResources',
-         testResourcesDir: './test/resources/testResources'
+         testResources: ['./test/resources/testResourceFiles/test-dep3.js'],
+         testResourcesDir: './test/resources/testResources',
       });
       this.server.start(done);
    });
@@ -33,14 +35,14 @@ describe('Server', function() {
             .get('/')
             .expect(200)
             .expect(function(res) {
-               expect(res.text).to.contain('<script src="/resources/gom-jabbar.js"></script>');
-               expect(res.text).to.contain('<script src="/resources/mocha.js"></script>');
-               expect(res.text).to.contain('<link rel="stylesheet" href="/resources/mocha.css" />');
+               expect(res.text).to.contain('<script src="/gom-jabbar-resources/gom-jabbar.js"></script>');
+               expect(res.text).to.contain('<script src="/gom-jabbar-resources/mocha.js"></script>');
+               expect(res.text).to.contain('<link rel="stylesheet" href="/gom-jabbar-resources/mocha.css" />');
             })
             .end(done);
       });
 
-      it('should include the src resources', function(done) {
+      it('should include the src resources from directory', function(done) {
          request(SERVER_URL)
             .get('/')
             .expect(200)
@@ -63,7 +65,17 @@ describe('Server', function() {
             .end(done);
       });
 
-      it('should include the test resources', function(done) {
+      it('should include the src resource files', function(done) {
+         request(SERVER_URL)
+            .get('/')
+            .expect(200)
+            .expect(function(res) {
+               expect(res.text).to.contain('<script src="/src-resources/src-dep3.js"></script>');
+            })
+            .end(done);
+      });
+
+      it('should include the test resources from directory', function(done) {
          request(SERVER_URL)
             .get('/')
             .expect(200)
@@ -82,6 +94,16 @@ describe('Server', function() {
                index1 = res.text.indexOf('<script src="/test-dep2.js"></script>');
                index2 = res.text.indexOf('<script src="/test-dep.js"></script>');
                expect(index1).to.be.below(index2);
+            })
+            .end(done);
+      });
+
+      it('should include the test resource files', function(done) {
+         request(SERVER_URL)
+            .get('/')
+            .expect(200)
+            .expect(function(res) {
+               expect(res.text).to.contain('<script src="/test-resources/test-dep3.js"></script>');
             })
             .end(done);
       });
@@ -131,7 +153,7 @@ describe('Server', function() {
 
       it('should server the gom-jabbar resource', function(done) {
          request(SERVER_URL)
-            .get('/resources/gom-jabbar.js')
+            .get('/gom-jabbar-resources/gom-jabbar.js')
             .expect(200)
             .expect('Content-Type', /javascript/)
             .expect(function(res) {
@@ -141,7 +163,7 @@ describe('Server', function() {
             .end(done);
       });
 
-      it('should server the source resources', function(done) {
+      it('should server the source resources for directory', function(done) {
          request(SERVER_URL)
             .get('/src-dep.js')
             .expect(200)
@@ -153,7 +175,19 @@ describe('Server', function() {
             .end(done);
       });
 
-      it('should server the test resources', function(done) {
+      it('should server the src resource files with required files', function(done) {
+         request(SERVER_URL)
+            .get('/src-resources/src-dep3.js')
+            .expect(200)
+            .expect('Content-Type', /javascript/)
+            .expect(function(res) {
+               expect(res.text).to.contain('var srcDep3 = {};');
+               expect(res.text).to.contain('var srcDep4 = {};');
+            })
+            .end(done);
+      });
+
+      it('should server the test resources for directory', function(done) {
          request(SERVER_URL)
             .get('/test-dep.js')
             .expect(200)
@@ -165,14 +199,14 @@ describe('Server', function() {
             .end(done);
       });
 
-      it('should server the test resources', function(done) {
+      it('should server the test resource files with required files', function(done) {
          request(SERVER_URL)
-            .get('/test-dep.js')
+            .get('/test-resources/test-dep3.js')
             .expect(200)
             .expect('Content-Type', /javascript/)
             .expect(function(res) {
-               var source = fs.readFileSync('./test/resources/testResources/test-dep.js').toString();
-               expect(res.text).to.equal(source);
+               expect(res.text).to.contain('var testDep3 = {};');
+               expect(res.text).to.contain('var testDep4 = {};');
             })
             .end(done);
       });
